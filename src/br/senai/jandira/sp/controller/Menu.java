@@ -7,7 +7,9 @@ public class Menu {
 
     public void executarMenu() throws SQLException {
 
+        ClienteController clienteController = new ClienteController();
         ProdutosController produtosController = new ProdutosController();
+        VendaController vendaController = new VendaController();
 
         Scanner scanner = new Scanner(System.in);
         boolean continuar = true;
@@ -46,18 +48,33 @@ public class Menu {
                     break;
 
                 case 3:
+                    System.out.println("Qual ID do produto que deseja excluir?");
+                    int idDigitado = scanner.nextInt();
+                    produtosController.deletarProdutos(idDigitado);
 
                     break;
 
                 case 4:
 
+                    System.out.println("Qual seu ID ?");
+                    int idCliente = scanner.nextInt();
+
+                    System.out.println("Qual o ID do Produto que deseja comprar?");
+                    int idProduto = scanner.nextInt();
+
+                    vendaController.realizarVenda(idCliente,idProduto);
+
                     break;
 
                 case 5:
 
+                    clienteController.cadastrarCliente();
+
                     break;
 
                 case 6:
+
+                    clienteController.listarCliente();
 
                     break;
 

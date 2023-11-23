@@ -12,6 +12,7 @@ import java.util.Scanner;
 public class ProdutosController {
 
 
+    Scanner scanner = new Scanner(System.in);
     Conexao conexao = new Conexao();
     Connection objConnection = conexao.getConnection();
 
@@ -19,7 +20,6 @@ public class ProdutosController {
 
         Statement statement = objConnection.createStatement();
 
-        Scanner scanner = new Scanner(System.in);
         System.out.println("---------- Adicionar Produto -----------");
         System.out.print("ID do Produto: ");
         int idProduto = scanner.nextInt();
@@ -37,13 +37,14 @@ public class ProdutosController {
         String caracteristicas = scanner.nextLine();
 
         String queryAdicionar = "INSERT INTO produtos (idProduto, nomeProduto, preco, quantidade, fornecedor, caracteristicasEspeciais) values (" +
-                idProduto + ",'" + nomeProduto +"','" + precoProduto + "','" + QtdProduto + "'," + fornecedor + "," + caracteristicas + ");";
+                idProduto + ",'" + nomeProduto +"','" + precoProduto + "','" + QtdProduto + "','" + fornecedor + "','" + caracteristicas + "');";
 
-        System.out.println("\n - Produto Cadastrado - \n");
+
 
 
         try {
             statement.executeUpdate(queryAdicionar);
+            System.out.println("\n - Produto Cadastrado - \n");
             return true;
         }catch (Exception erro){
             System.out.println(erro);
@@ -81,6 +82,54 @@ public class ProdutosController {
             System.out.println("\n -------------------------------\n");
 
         }
+    }
+
+    public boolean deletarProdutos(int idProduto) throws SQLException {
+
+        Statement statement = objConnection.createStatement();
+
+        String queryBusca = "SELECT quantidade FROM produtos WHERE idProduto =" + idProduto;
+        ResultSet resultSet = statement.executeQuery(queryBusca);
+
+        Produtos produtos = new Produtos();
+
+        while (resultSet.next()){
+            produtos.setQuantidade(resultSet.getInt("quantidade"));
+        }
+
+        System.out.println("\n O produto com o Código: " +idProduto+ " tem " + produtos.getQuantidade()+" quantidades em estoque");
+        System.out.println("\n  Quantas unidades do produto você deseja excluir?");
+        int quantidadeDesejada = scanner.nextInt();
+
+
+        if (quantidadeDesejada >= produtos.getQuantidade()){
+            String queryDelete = "DELETE FROM produtos WHERE idProduto = " + idProduto;
+            statement.executeUpdate(queryDelete);
+            System.out.println("Acabou todo estoque do Produto, e ele foi excluido do banco!");
+            try {
+                statement.executeUpdate(queryDelete);
+                return true;
+            }catch (Exception erro){
+                System.out.println(erro);
+                return false;
+            }
+        }else{
+            int novaQuantidade = produtos.getQuantidade() - quantidadeDesejada;
+
+            String queryUpdate = "UPDATE produtos SET quantidade = " + novaQuantidade+ " WHERE idProduto = " + idProduto;
+            int resultSetUpdate = statement.executeUpdate(queryUpdate);
+            System.out.println("Quantidade Atualizada!");
+
+            try {
+                statement.executeUpdate(queryUpdate);
+                return true;
+            }catch (Exception erro){
+                System.out.println(erro);
+                return false;
+            }
+
+        }
+
     }
 
 }
